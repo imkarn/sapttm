@@ -54,4 +54,21 @@ $config['Z_RFC_SM_007'] = array(
                           array("EXPORT","EP_ERRFLAG",array()),
                           array("EXPORT","EP_MESSAGE",array())
                           );
+						  
+$config['Z_RFC_MM_202'] = array( 
+                          array("IMPORT","IM_MACID",''),
+
+                          array("EXPORT","EP_ERRFLAG",array()),
+                          array("EXPORT","EP_MESSAGE",array()),
+						  array("TABLE","TAB_DISPLAY_202",array())
+                          );
+						  
+$config['Z_RFC_MM_201'] = array( 
+                          array("IMPORT","IM_MACID",''),
+						  array("IMPORT","IM_NUMBER",''),
+
+                          array("EXPORT","EP_ERRFLAG",array()),
+                          array("EXPORT","EP_MESSAGE",array()),
+						  array("TABLE","TAB_ERRMSG",array())
+                          );
 ?>

@@ -133,7 +133,7 @@
                             <label for="user-verify">Username</label>
                             <input type="text" name="user-verify" id="user-verify" value="<?php echo set_value('user-verify');?>">
                             <label for="code-verify">Register Code</label>
-                            <input type="text" name="code-verify" id="code-verify" value="<?php echo set_value('code-verify');?>">
+                            <input type="text" name="code-verify" maxlength="4" id="code-verify" value="<?php echo set_value('code-verify');?>">
                             <button type="submit">Verify</button>
 			</p>
                     </fieldset>

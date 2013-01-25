@@ -282,7 +282,7 @@
 		// Close button
 		if (settings.closeButton)
 		{
-			$('<ul class="action-tabs right"><li><a href="#" title="Close window"><img src="images/icons/fugue/cross-circle.png" width="16" height="16"></a></li></ul>')
+			$('<ul class="action-tabs right"><li><a href="#" title="Close window"><img src="../../images/icons/fugue/cross-circle.png" width="16" height="16"></a></li></ul>')
 				.prependTo(win)
 				.find('a').click(function(event)
 				{

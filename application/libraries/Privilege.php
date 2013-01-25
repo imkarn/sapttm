@@ -20,9 +20,14 @@ class Privilege {
 	
 	public function outputHead($fun){
 		$pivi = $this->CI->session->userdata('EP_MENUSCR');
-		$this->CI->load->view('layout/header');
 		$data['active'] = $fun;
-		$this->CI->load->view('menu/'.$pivi.'_menu',$data);
+		if ($this->CI->agent->is_mobile()){
+			$this->CI->load->view('layout/mheader');
+			$this->CI->load->view('menu/'.$pivi.'_mmenu',$data);
+		}else{
+			$this->CI->load->view('layout/header');
+			$this->CI->load->view('menu/'.$pivi.'_menu',$data);
+		}
 	}
 	
 	public function checkPermission($fun){

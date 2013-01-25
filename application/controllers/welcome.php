@@ -13,7 +13,11 @@ class Welcome extends CI_Controller {
             }else if($this->session->flashdata('ok')){
                  $data['ok'] = $this->session->flashdata('ok');
             }
-            $this->load->view('authen/loginform',$data);
+			if ($this->agent->is_mobile()){
+				$this->load->view('mobile/login',$data);
+			}else{
+				$this->load->view('authen/loginform',$data);
+			}
 		}
 	}
         
@@ -72,12 +76,12 @@ class Welcome extends CI_Controller {
                             $tmp[1][2] = $this->input->post('pass');
                             // แก้ไขค่าในส่วนของ  array("IMPORT","IM_MACID",'07c56eb9692b9fc564392e9ca135ac89') โดยใส่ค่าตัวแปร $iduser
                             $tmp[2][2] = $iduser;
-
+							
                             //กำหนดค่าในการตัวแปร logindata ใน lib saprfc = ตัวแปร array logindata300 หรือ logindata900 ที่เซ็ตไว้ใน ttm_config เพื่อใช้ในการ connect 
                             $this->mysap->logindata = $this->config->item('logindata'.$this->input->post('client'));
                             //Call rfc function Z_RFC_SM_001 โดยมี parameter เป็น array $tmp
                             $result=$this->mysap->callFunction("Z_RFC_SM_001",$tmp);  
-
+							
                             if($result['EP_AUTH']=="Y"){
                                 $newdata = array(
                                     'EP_NAME'  => iconv('TIS-620','UTF-8',trim($result['EP_NAME'])),
@@ -90,17 +94,25 @@ class Welcome extends CI_Controller {
 									'EP_CLIENT'  => trim($this->input->post('client')),
                                 );
 								//$this->config->set_item('sess_expiration',0); 
-								$this->session->sess_expiration = 0;
+								$this->session->sess_expiration = 60*60*365*2;
                                 $this->session->set_userdata($newdata);
 								redirect('/welcome/main');
                             }else{
-                                $data['errors'] = $result['EP_MESSAGE'];
-                                $this->load->view('authen/loginform',$data);
+                                $data['errors'] = iconv('TIS-620','UTF-8',trim($result['EP_MESSAGE']));
+								if ($this->agent->is_mobile()){
+									$this->load->view('mobile/login',$data);
+								}else{
+									$this->load->view('authen/loginform',$data);
+								}
                             }
                         }else{
                             // ถ้าไม่มี
-                            $data['errors'] = "Please Get Register Code for Verify!!";
-                            $this->load->view('authen/loginform',$data);
+							$data['errors'] = "Please Verify Authorize !!";
+							if ($this->agent->is_mobile()){
+								$this->load->view('mobile/login',$data);
+							}else{
+								$this->load->view('authen/loginform',$data);
+							}
                         }
                     }else{
                         //ถ้าไม่มี Cookie
@@ -139,27 +151,44 @@ class Welcome extends CI_Controller {
 									$this->session->set_userdata($newdata);
 									redirect('/welcome/main');
 								}else{
-									$data['errors'] = $result['EP_MESSAGE'];
-									$this->load->view('authen/loginform',$data);
+									$data['errors'] = iconv('TIS-620','UTF-8',trim($result['EP_MESSAGE']));
+									if ($this->agent->is_mobile()){
+										$this->load->view('mobile/login',$data);
+									}else{
+										$this->load->view('authen/loginform',$data);
+									}
 								}
 							}else{
-								$data['errors'] = "Please Get Register Code for Verify!!";
-								$this->load->view('authen/loginform',$data);
+								$data['errors'] = "Please Verify Authorize !!";
+								if ($this->agent->is_mobile()){
+									$this->load->view('mobile/login',$data);
+								}else{
+									$this->load->view('authen/loginform',$data);
+								}
 							}
 						}else{
-							$data['errors'] = "Please Get Register Code for Verify!!";
-                            $this->load->view('authen/loginform',$data);
+							$data['errors'] = "Please Verify Authorize !!";
+							if ($this->agent->is_mobile()){
+								$this->load->view('mobile/login',$data);
+							}else{
+								$this->load->view('authen/loginform',$data);
+							}
 						}
                     }
                 }else{
                     //ถ้า validation ไม่ผ่าน
                     //ให้ load view form และส่ง error ไปที่ view เพื่อแสดงด้วย
-                    $this->load->view('authen/loginform');
+                    if ($this->agent->is_mobile()){
+						$this->load->view('mobile/login');
+					}else{
+						$this->load->view('authen/loginform');
+					}
                 }
             }else{
                 //ถ้าไม่เป็นแบบ Post
                 //redirect ไปหน้า form
-                redirect('/welcome/'); 
+                //redirect('/welcome/'); 
+				show_404();
             }
         }
         
@@ -203,19 +232,26 @@ class Welcome extends CI_Controller {
                     $this->mysap->logindata = $this->config->item('logindata300'); // fix client 300
 				}else{
 					//redirect ไปหน้า form
-					redirect('/welcome/');
+					if ($this->agent->is_mobile()){
+						redirect('/welcome/verifyForm');
+					}else{
+						redirect('/welcome/');
+					}
 				}
                 
 				//Call rfc function Z_RFC_SM_006 โดยมี parameter เป็น array $tmp
                 $result=$this->mysap->callFunction("Z_RFC_SM_006",$tmp);
-				
+				$data['errors'] = iconv('TIS-620','UTF-8',trim($result['EP_MESSAGE']));
 				//check ว่า verify ผ่านหรือไม่
                 if($result['EP_ERRFLAG']=="X"){
 					//ถ้า ไม่ผ่าน
-					//set ค่า error ไปให้ view เพื่อนำไปแสดง 
-					$data['errors'] = "Incorrect Register Code Contact IT Dept!!";
-					//load view พร้อมทั้งส่งค่าตัวแปรไปที่หน้า view ด้วย
-					$this->load->view('authen/loginform',$data);
+					if ($this->agent->is_mobile()){
+						//load view พร้อมทั้งส่งค่าตัวแปรไปที่หน้า view ด้วย
+						$this->load->view('mobile/verifyform',$data);
+					}else{
+						//load view พร้อมทั้งส่งค่าตัวแปรไปที่หน้า view ด้วย
+						$this->load->view('authen/loginform',$data);
+					}
                 }else{
 					//ถ้า ผ่าน
                     // load lib verify ที่ใช้ในการจัดการ verify ระหว่าง Sv. กะ Client
@@ -285,12 +321,16 @@ class Welcome extends CI_Controller {
             }else{
                 $this->session->set_flashdata('error', 'Device Not Verify Or Iduse Incorrect');
             }
-            redirect('/welcome/');
+				redirect('/welcome/');
         }
         
         // แสดง form หน้า ขอ Verify Code 4
         public function getCode(){
-           $this->load->view('authen/codeform');
+			if ($this->agent->is_mobile()){
+				$this->load->view('mobile/codeform');
+			}else{
+				$this->load->view('authen/codeform');
+			}
         }
         
         // ส่ง Verify Code 4 หลักทาง e-mail.
@@ -307,7 +347,7 @@ class Welcome extends CI_Controller {
                 //set เงื่อนไข สำหรับ field user โดย เงื่อนไข required|trim|xss_clean
                 $this->form_validation->set_rules('user','username','required|trim|xss_clean');
                 //set เงื่อนไข สำหรับ field pass โดย เงื่อนไข required|trim|xss_clean
-		$this->form_validation->set_rules('pass','password','required|trim|xss_clean');
+				$this->form_validation->set_rules('pass','password','required|trim|xss_clean');
                 //$this->form_validation->set_rules('pass','รหัสผ่าน','trim|xss_clean');
                 //set เงื่อนไข สำหรับ select client โดย เงื่อนไข required|trim|xss_clean
                 $this->form_validation->set_rules('client',' ','required|trim|xss_clean');
@@ -331,12 +371,17 @@ class Welcome extends CI_Controller {
                      //check user and pass
                      if($result['EP_ERRFLAG']=="X"){
                          //incorrect add error to $data['errors']
-                         $data['errors'] = $result['EP_MESSAGE'];
+                         $data['errors'] = iconv('TIS-620','UTF-8',trim($result['EP_MESSAGE']));
                          //load view codeform and send $data
-                         $this->load->view('authen/codeform',$data);
+						 if ($this->agent->is_mobile()){
+							$this->load->view('mobile/codeform',$data);
+						 }else{
+							$this->load->view('authen/codeform',$data);
+						 }
+                         
                      }else{
                          //correct add EP_MESSAGE to $mss
-                        $mss = $result['EP_MESSAGE'];
+                        $mss = iconv('TIS-620','UTF-8',trim($result['EP_MESSAGE']));
                         // make flash for show success
                         $this->session->set_flashdata('ok',$mss);
                         //redirect to login page
@@ -345,7 +390,11 @@ class Welcome extends CI_Controller {
                 }else{
                     //ถ้า validation ไม่ผ่าน
                     //ให้ load view form และส่ง error ไปที่ view เพื่อแสดงด้วย
-                    $this->load->view('authen/codeform');
+					 if ($this->agent->is_mobile()){
+						$this->load->view('mobile/codeform');
+					 }else{
+						$this->load->view('authen/codeform');
+					 }
                 }
             }else{
                 redirect('/welcome/getCode');
@@ -359,11 +408,20 @@ class Welcome extends CI_Controller {
 				$this->load->library('privilege'); 
 				if($fun==null){
 					$this->privilege->outputHead($fun);
-					$this->load->view('layout/main');
+					if ($this->agent->is_mobile()){
+						$this->load->view('layout/mmain');
+					}else{
+						$this->load->view('layout/main');
+					}
 				}else{
 					$arr = explode ("_",strtoupper($fun));
+					$num = count($arr);
 					if(isset($arr[2])){
-						$ct = $arr[0]."_".$arr[1];
+						$ct = "";
+						for($i=0;$i<($num-1);$i++){
+							$ct .= ($i==$num-2)? $arr[$i]:$arr[$i]."_";
+						}
+
 						redirect($ct.'/'.$fun);
 					}else{
 						show_404();
@@ -372,6 +430,7 @@ class Welcome extends CI_Controller {
 			}else{
 				//redirect to login page
                 redirect('/welcome/');
+				//print_r($this->session->all_userdata());
 			}
         }
 		
@@ -387,6 +446,20 @@ class Welcome extends CI_Controller {
 			//redirect to login page
             redirect('/welcome/');
 		}
+		
+		function verifyForm(){
+			$data = array();
+            if($this->session->flashdata('error')){
+                 $data['errors'] = $this->session->flashdata('error');
+            }else if($this->session->flashdata('ok')){
+                 $data['ok'] = $this->session->flashdata('ok');
+            }
+			if ($this->agent->is_mobile()){
+				$this->load->view('mobile/verifyform',$data);
+			}else{
+				show_404();
+			}
+		}
 
 		public function test(){
 			//$this->session->set_userdata('MDID555', "1234567890");
@@ -401,6 +474,7 @@ class Welcome extends CI_Controller {
 			}*/
 			//$this->session->sess_destroy();
 			//delete_cookie("MDID");
-			var_dump($_COOKIE);
+			//var_dump($_COOKIE);
+			$this->load->view('mobile/login');
 		}
 }

@@ -3,7 +3,7 @@
 <!--[if IE 8 ]><html lang="en" class="no-js ie"><![endif]-->
 <!--[if (gt IE 8)|!(IE)]><!--><html lang="en" class="no-js"><!--<![endif]-->
 <head>
-	<meta charset="TIS-620">
+	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	
 	<title>Toptrend Web UI LogOn</title>

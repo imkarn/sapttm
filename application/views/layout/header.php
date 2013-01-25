@@ -34,7 +34,19 @@
 	
 	<!-- Modernizr for support detection, all javascript libs are moved right above </body> for better performance -->
 	<script src="<?php echo base_url();?>js/libs/modernizr.custom.min.js"></script>
+	<script src="<?php echo base_url();?>js/libs/jquery-1.6.3.min.js"></script>
+	<script src="<?php echo base_url();?>js/old-browsers.js"></script>		<!-- remove if you do not need older browsers detection -->
 	
+	<!-- Template libs -->
+	<script src="<?php echo base_url();?>js/common.js"></script>
+	<script src="<?php echo base_url();?>js/standard.js"></script>
+	<!--[if lte IE 8]><script src="<?php echo base_url();?>js/standard.ie.js"></script><![endif]-->
+	<script src="<?php echo base_url();?>js/jquery.tip.js"></script>
+	<script src="<?php echo base_url();?>js/jquery.modal.js"></script>
+	
+	<!-- Combined JS load -->
+	<script src="<?php echo base_url();?>js/mini.php?files=libs/jquery-1.6.3.min,old-browsers,common,standard,jquery.tip"></script>
+	<!--[if lte IE 8]><script src="<?php echo base_url();?>js/standard.ie.js"></script><![endif]-->
 </head>
 <body>
 <!-- Header -->

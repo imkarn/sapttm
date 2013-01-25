@@ -11,7 +11,10 @@
  * @author Quize
 **/
 class Mysap extends saprfc {
-    
+    function getInterface($logindata){
+        $this->setLoginData($logindata);
+        $this->login();
+    }
 }
 
 ?>
